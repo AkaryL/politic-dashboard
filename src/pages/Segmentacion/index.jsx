@@ -2,8 +2,8 @@ import React from 'react'
 import { Card, Layout, DonutChart2, CircleChart, SocialPlatforms } from '../../components';
 
 function Segmentacion() {
-  // Datos para el gráfico de Edad
-  const edadData = [
+  // Datos para el gráfico de Edad con porcentajes
+  const edadDataRaw = [
     { label: '18-25', value: 12, color: '#E0E0E0' },      // Gris muy claro
     { label: '26-34', value: 18, color: '#BDBDBD' },      // Gris claro
     { label: '34-44', value: 25, color: '#FFC107' },      // Amarillo
@@ -11,6 +11,13 @@ function Segmentacion() {
     { label: '55-64', value: 15, color: '#FF9800' },      // Naranja
     { label: '65+', value: 10, color: '#FF6B35' }         // Naranja oscuro
   ];
+
+  // Calcular el total y agregar porcentajes a las etiquetas
+  const totalEdad = edadDataRaw.reduce((sum, item) => sum + item.value, 0);
+  const edadData = edadDataRaw.map(item => ({
+    ...item,
+    label: `${item.label} (${Math.round((item.value / totalEdad) * 100)}%)`
+  }));
 
   // Datos para el gráfico de Género
   const generoData = [
@@ -20,17 +27,17 @@ function Segmentacion() {
 
   // Datos para Ocupación
   const ocupacionData = [
-    { label: 'Agropecuario', value: 5, color: '#9E9E9E' },
-    { label: 'Artesano', value: 8, color: '#757575' },
-    { label: 'Comercio', value: 15, color: '#616161' },
+    { label: 'Agroindustria', value: 5, color: '#9E9E9E' },
+    { label: 'Artesanía', value: 8, color: '#757575' },
+    { label: 'Automotriz', value: 15, color: '#616161' },
     { label: 'Construcción', value: 10, color: '#424242' },
-    { label: 'Electricista', value: 7, color: '#FFC107' },
+    { label: 'Electrónica', value: 7, color: '#FFC107' },
     { label: 'Tecnología de la inf', value: 12, color: '#FFD54F' },
-    { label: 'Energía Eléctrica', value: 6, color: '#FFE082' },
-    { label: 'Industria', value: 10, color: '#FFAB91' },
-    { label: 'Minería', value: 3, color: '#FF8A65' },
-    { label: 'Servicios', value: 18, color: '#FF7043' },
-    { label: 'Protección Ciudadana', value: 6, color: '#FF5722' }
+    { label: 'Enegía Eléctrica', value: 6, color: '#FFE082' },
+    { label: 'Farmaceutico', value: 10, color: '#FFAB91' },
+    { label: 'Moda', value: 3, color: '#FF8A65' },
+    { label: 'Muebles', value: 18, color: '#FF7043' },
+    { label: 'Productos Químicos', value: 6, color: '#FF5722' }
   ];
   
   // Datos de intereses
@@ -68,6 +75,17 @@ function Segmentacion() {
     { label: 'Compras online', value: 15, color: '#9E9E9E' },
     { label: 'Otros', value: 10, color: '#757575' }
   ];
+
+  // Función para obtener colores de las barras de intereses
+  const getColor = (index, count) => {
+    const residuo = index % 4;
+    switch(residuo){
+      case 0: return `linear-gradient(90deg,rgb(255, 109, 77) 0%,rgb(255, 109, 77) ${count}%, rgb(255, 109, 77, .15) ${count}%, rgb(255, 109, 77, .15) 100%)`;
+      case 1: return `linear-gradient(90deg,rgb(255, 189, 89) 0%,rgb(255, 189, 89) ${count}%, rgb(255, 189, 89, .15) ${count}%, rgb(255, 189, 89, .15) 100%)`;
+      case 2: return `linear-gradient(90deg,rgb(255, 222, 89) 0%,rgb(255, 222, 89) ${count}%, rgb(255, 222, 89, .15) ${count}%, rgb(255, 222, 89, .15) 100%)`;
+      default: return `linear-gradient(90deg,rgb(255, 145, 77) 0%,rgb(255, 145, 77) ${count}%, rgb(255, 145, 77, .15) ${count}%, rgb(255, 145, 77, .15) 100%)`;
+    }
+  }
 
   return (
     <Layout>
@@ -121,46 +139,26 @@ function Segmentacion() {
           <div className='flex gap-3 w-full'>
             <div className='w-[50%]'>
               <Card title="Intereses">
-                <div className='w-full h-full flex flex-col py-2'>
-                  {/* Barras de intereses */}
-                  <div className='flex flex-col gap-3 mb-4'>
-                    {intereses.map((tema, index) => (
-                      <div key={index} className='w-full'>
-                        <div className='flex items-center justify-between mb-1'>
-                          <span className='text-gray-600 text-sm lg:text-base font-medium'>
-                            {tema.label}
-                          </span>
-                        </div>
-                        <div className='flex items-center gap-2'>
-                          <div className='w-[80%] h-3 rounded-full overflow-hidden bg-gray-200'>
-                            <div 
-                              className='h-full rounded-full transition-all duration-300'
-                              style={{ 
-                                width: `${tema.count}%`,
-                                backgroundColor: tema.color
-                              }}
-                            />
-                          </div>
-                          <span className='text-gray-500 text-sm font-semibold'>
+                <div className='w-full h-full flex flex-col justify-around py-1'>
+                  {intereses.map((tema, index) => (
+                    <div key={index} className='w-full flex flex-col'>
+                      <div className='flex group gap-2 w-full items-center justify-between px-3'>
+                        <h1 className='text-gray-500 text-lg'>{tema.label}</h1>
+                        <div className='w-[60%] h-2 rounded-2xl' style={{ background: getColor(index, tema.count)}}>
+                          <div className='text-gray-400 text-lg font-semibold w-min relative -top-3 -left-13 px-2 rounded-lg group-hover:block'>
                             {tema.count}%
-                          </span>
+                          </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                  
-                  {/* Hashtags frecuentes */}
-                  <div className='mt-auto pt-4 border-t border-gray-200'>
-                    <h3 className='text-base lg:text-lg text-tertiary font-bold mb-2'>
-                      Hashtags Frecuentes
-                    </h3>
-                    <div className="flex flex-wrap gap-x-2 gap-y-1">
-                      {Hashtags.map((tag, index) => (
-                        <span key={index} className="text-xs lg:text-sm text-gray-600">
-                          {tag}{index < Hashtags.length - 1 && ','}
-                        </span>
-                      ))}
                     </div>
+                  ))}
+                  <h1 className='text-[1.3rem] xl:text-[1.8rem] text-tertiary font-bold mt-3'>
+                    Hashtags Frecuentes
+                  </h1>
+                  <div className="flex flex-wrap gap-1">
+                    {Hashtags.map((tag, index) => (
+                      <span key={index} className="text-sm text-gray-700">{tag},</span>
+                    ))}
                   </div>
                 </div>
               </Card>
